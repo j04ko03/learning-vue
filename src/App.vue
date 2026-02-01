@@ -10,13 +10,17 @@ const inStock = true
 const details = ref(['50% cotton', '30% wool', '20% polyester'])
 
 const variants = ref([
-  { id: 2234, color: 'green', image: socksGreenImage },
-  { id: 2235, color: 'blue', image: socksBlueImage },
+  { id: 2234, color: 'green', image: socksGreenImage, price: 10 },
+  { id: 2235, color: 'blue', image: socksBlueImage, price: 15 },
 ])
 
 const cart = ref(0)
 
-const addToCart = () => cart.value +=1
+const addToCart = () => {
+  if (cart.value < 5) {
+    cart.value += 1
+  }
+}
 
 const updateImage = (variantImage) =>  {
   image.value = variantImage
@@ -47,8 +51,9 @@ const removeFromCart = () => {
           :key="variant.id"
           @mouseover="updateImage(variant.image)"
         >
-          {{ variant.color }}
+          {{ variant.color }} - €{{ variant.price }}
         </div>
+        <p v-if="cart === 0">Your cart is empty</p>
         <button class="button" v-on:click="addToCart">Add to Cart</button>
         <!-- @ es el shorthand de v-on -->
          <button class="button" v-on:click="removeFromCart">Remove from Cart</button>
