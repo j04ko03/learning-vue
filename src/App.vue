@@ -5,26 +5,46 @@ import socksBlueImage from './assets/images/socks_blue.jpeg'
 
 const product = ref('Socks')
 const brand = ref('Vue Mastery')
+const onSale = ref(true)
 
 const selectedVariant = ref(0)
   
 const details = ref(['50% cotton', '30% wool', '20% polyester'])
 
 const variants = ref([
-  { id: 2234, color: 'green', image: socksGreenImage, quantity: 50 },
-  { id: 2235, color: 'blue', image: socksBlueImage, quantity: 0 },
+  { id: 2234, color: 'green', image: socksGreenImage, quantity: 50, price: 10 },
+  { id: 2235, color: 'blue', image: socksBlueImage, quantity: 10, price: 12 },
 ])
 
-const cart = ref(0)
+const cart = ref([])
 
-const addToCart = () => cart.value += 1
+const addToCart = () => cart.value.push(variants.value[selectedVariant.value])
+
+const removeFromCart = () => {
+  const itemToRemove = variants.value[selectedVariant.value]
+  const index = cart.value.indexOf(itemToRemove)
+  if (index > -1) {
+    cart.value.splice(index, 1)
+  }
+}
+
+const totalItems = computed(() => cart.value.length)
+
+const totalCost = computed(() => cart.value.reduce((acc, item) => acc + item.price, 0))
 
 const updateVariant = (index) => {
   selectedVariant.value = index
   console.log(index)
 }
 
-const title = computed (() => {
+const inStock = computed(() => {
+  return variants.value[selectedVariant.value].quantity > 0
+})
+
+const title = computed(() => {
+  if (onSale.value ) {
+    return brand.value + ' ' + product.value + ' is on sale'
+  }
   return brand.value + ' ' + product.value
 })
 
@@ -36,7 +56,7 @@ const image = computed (() => {
   
 <template>
   <div class="nav-bar"></div>
-  <div class="cart">Cart({{ cart }})</div>
+  <div class="cart">Cart({{ totalItems }}) Total: {{ totalCost }}€</div>
   <div class="product-display">
     <div class="product-container">
       <div class="product-image">    
@@ -64,6 +84,12 @@ const image = computed (() => {
           v-on:click="addToCart"
         >
           Add to cart
+        </button>
+        <button 
+          class="button" 
+          @click="removeFromCart"
+        >
+          Remove Item
         </button>
       </div>
     </div>
